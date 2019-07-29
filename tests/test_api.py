@@ -112,3 +112,33 @@ def test_get_price(request, client):
     request.assert_called_once_with(
         'getprice', params={'count': 200, 'period': 15, 'version': ProxyVersion.IPv4}
     )
+
+
+@mock.patch('proxy6.api.Proxy6._request')
+def test_get_count(request, client):
+    request.return_value = {
+        'status': 'yes',
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'count': 971,
+    }
+
+    assert client.get_count(country='ru') == 971
+
+    request.assert_called_once_with('getcount', params={'country': 'ru'})
+    request.reset_mock()
+
+    request.return_value = {
+        'status': 'yes',
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'count': 179,
+    }
+
+    assert client.get_count(country='ru', version=ProxyVersion.IPv4) == 179
+
+    request.assert_called_once_with(
+        'getcount', params={'country': 'ru', 'version': ProxyVersion.IPv4}
+    )

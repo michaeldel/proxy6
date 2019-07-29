@@ -65,3 +65,23 @@ class Proxy6:
         self.__class__._pop_common_fields(data)
 
         return data
+
+    def get_count(self, country: str, version: Optional[ProxyVersion] = None) -> int:
+        """
+        Get information about the amount of proxies available to purchase for
+        a selected country
+
+        :param count: Country code in ISO2 format
+        :param version: Proxy version (default is IPv6)
+
+        :returns: available amount of proxies
+
+        :raises Proxy6Error:
+        """
+        params = _cleaned_dict(country=country, version=version)
+        data = self._request('getcount', params=params)
+
+        self.__class__._pop_common_fields(data)
+        assert len(data) == 1
+
+        return data['count']
