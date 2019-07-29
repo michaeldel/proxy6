@@ -1,9 +1,11 @@
 import urllib.parse
 
+from unittest import mock
+
 import pytest
 import responses
 
-from proxy6.api import Proxy6, Proxy6Error
+from proxy6.api import Proxy6, ProxyVersion, Proxy6Error
 
 
 @responses.activate
@@ -64,3 +66,49 @@ def test_requests_failed():
     e = exc_info.value
     assert e.code == 123
     assert str(e) == "Lorem ipsum"
+
+
+@mock.patch('proxy6.api.Proxy6._request')
+def test_get_price(request, client):
+    request.return_value = {
+        'status': 'yes',
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'price': 1800,
+        'price_single': 0.6,
+        'period': 30,
+        'count': 100,
+    }
+
+    assert client.get_price(count=100, period=30) == {
+        'price': 1800,
+        'price_single': 0.6,
+        'period': 30,
+        'count': 100,
+    }
+
+    request.assert_called_once_with('getprice', params={'count': 100, 'period': 30})
+    request.reset_mock()
+
+    request.return_value = {
+        'status': 'yes',
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'price': 600,
+        'price_single': 0.2,
+        'period': 15,
+        'count': 200,
+    }
+
+    assert client.get_price(count=200, period=15, version=ProxyVersion.IPv4) == {
+        'price': 600,
+        'price_single': 0.2,
+        'period': 15,
+        'count': 200,
+    }
+
+    request.assert_called_once_with(
+        'getprice', params={'count': 200, 'period': 15, 'version': ProxyVersion.IPv4}
+    )
