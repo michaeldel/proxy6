@@ -22,7 +22,7 @@ def test_requests():
     responses.add(
         responses.GET,
         'https://proxy6.net/api/1e339044/foo',
-        json={'success': 'yes', 'result': 3}
+        json={'success': 'yes', 'result': 3},
     )
 
     data = client._request('foo', params={'a': 1, 'b': 2})
@@ -44,7 +44,6 @@ def test_requests():
     assert request.url == 'https://proxy6.net/api/1e339044/foo'
 
 
-
 @responses.activate
 def test_requests_failed():
     """
@@ -53,9 +52,11 @@ def test_requests_failed():
     """
     client = Proxy6(api_key='key')
 
-    responses.add(responses.GET, 'https://proxy6.net/api/key/foo', json={
-        'success': 'no', 'error_id': 123, 'error': "Lorem ipsum"
-    })
+    responses.add(
+        responses.GET,
+        'https://proxy6.net/api/key/foo',
+        json={'success': 'no', 'error_id': 123, 'error': "Lorem ipsum"},
+    )
 
     with pytest.raises(Proxy6Error) as exc_info:
         client._request('foo')
