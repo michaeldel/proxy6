@@ -13,7 +13,7 @@ def test_requests():
 
         https://proxy6.net/api/{api_key}/{method}?{params}
 
-    and return JSON data stripped from the `'success'` field
+    and return JSON data stripped from the `'status'` field
     """
     api_key = '1e339044'
 
@@ -22,7 +22,7 @@ def test_requests():
     responses.add(
         responses.GET,
         'https://proxy6.net/api/1e339044/foo',
-        json={'success': 'yes', 'result': 3},
+        json={'status': 'yes', 'result': 3},
     )
 
     data = client._request('foo', params={'a': 1, 'b': 2})
@@ -47,7 +47,7 @@ def test_requests():
 @responses.activate
 def test_requests_failed():
     """
-    Requests not having the `'success'` result field set to `'yes'` should
+    Requests not having the `'status'` result field set to `'yes'` should
     raise a Proxy6Error
     """
     client = Proxy6(api_key='key')
@@ -55,7 +55,7 @@ def test_requests_failed():
     responses.add(
         responses.GET,
         'https://proxy6.net/api/key/foo',
-        json={'success': 'no', 'error_id': 123, 'error': "Lorem ipsum"},
+        json={'status': 'no', 'error_id': 123, 'error': "Lorem ipsum"},
     )
 
     with pytest.raises(Proxy6Error) as exc_info:

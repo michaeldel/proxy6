@@ -22,7 +22,7 @@ class Proxy6:
         assert response.ok  # TODO: handle other cases
 
         data = response.json()
-        if data.pop('success') != 'yes':
+        if data.pop('status') != 'yes':
             raise Proxy6Error(data)
 
         return data
