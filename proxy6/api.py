@@ -103,3 +103,23 @@ class Proxy6:
         assert len(data) == 1
 
         return data['list']
+
+    def is_proxy_valid(self, *, proxy_id: int) -> bool:
+        """
+        Checks the validity of a proxy
+
+        :param proxy_id: proxy identifier
+
+        :returns: proxy validity status
+
+        :raises Proxy6Error:
+        """
+        params = _cleaned_dict(ids=proxy_id)
+        data = self._request('check', params=params)
+
+        self.__class__._pop_common_fields(data)
+
+        assert data.pop('proxy_id') == proxy_id
+        assert len(data) == 1
+
+        return data['proxy_status']

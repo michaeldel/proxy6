@@ -170,3 +170,19 @@ def test_get_country(request, client):
     assert client.get_countries(version=ProxyVersion.IPv4) == ['de', 'fr', 'es']
 
     request.assert_called_once_with('getcountry', params={'version': ProxyVersion.IPv4})
+
+
+@mock.patch('proxy6.api.Proxy6._request')
+def test_is_proxy_valid(request, client):
+    request.return_value = {
+        'status': 'yes',
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'proxy_id': 15,
+        'proxy_status': True,
+    }
+
+    assert client.is_proxy_valid(proxy_id=15)
+
+    request.assert_called_once_with('check', params={'ids': 15})
