@@ -1,8 +1,26 @@
 [tool.poetry]
-name = "proxy6"
+name = "proxysix"
 version = "0.1.0"
-description = ""
+description = "API wrapper for Proxy6"
+license = "MIT"
 authors = ["michaeldel <michaeldel@protonmail.com>"]
+
+readme = "README.md"
+repository = "https://github.com/michaeldel/proxy6"
+
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Topic :: Internet",
+  "Topic :: Internet :: Proxy Servers",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+packages = [
+  { include = "proxy6" },
+]
+
+
 
 [tool.poetry.dependencies]
 python = "^3.7"
