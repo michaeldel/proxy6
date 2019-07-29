@@ -66,7 +66,7 @@ class Proxy6:
 
         return data
 
-    def get_count(self, country: str, version: Optional[ProxyVersion] = None) -> int:
+    def get_count(self, *, country: str, version: Optional[ProxyVersion] = None) -> int:
         """
         Get information about the amount of proxies available to purchase for
         a selected country
@@ -86,7 +86,7 @@ class Proxy6:
 
         return data['count']
 
-    def get_countries(self, version: Optional[ProxyVersion] = None) -> List[str]:
+    def get_countries(self, *, version: Optional[ProxyVersion] = None) -> List[str]:
         """
         Get information on available for proxies purchase countries
 
