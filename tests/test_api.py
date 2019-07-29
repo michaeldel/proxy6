@@ -1,8 +1,9 @@
 import urllib.parse
 
+import pytest
 import responses
 
-from proxy6.api import Proxy6
+from proxy6.api import Proxy6, Proxy6Error
 
 
 @responses.activate
@@ -12,7 +13,7 @@ def test_requests():
 
         https://proxy6.net/api/{api_key}/{method}?{params}
 
-    and return JSON data
+    and return JSON data stripped from the `'success'` field
     """
     api_key = '1e339044'
 
@@ -21,13 +22,44 @@ def test_requests():
     responses.add(
         responses.GET,
         'https://proxy6.net/api/1e339044/foo',
-        json={'success': 'yes'}
+        json={'success': 'yes', 'result': 3}
     )
 
     data = client._request('foo', params={'a': 1, 'b': 2})
-    assert data == {'success': 'yes'}
+    assert data == {'result': 3}
 
     assert len(responses.calls) == 1
 
     request = responses.calls[0].request
     assert request.url == 'https://proxy6.net/api/1e339044/foo?a=1&b=2'
+
+    # request should work with no param
+
+    data = client._request('foo')
+    assert data == {'result': 3}
+
+    assert len(responses.calls) == 2
+
+    request = responses.calls[1].request
+    assert request.url == 'https://proxy6.net/api/1e339044/foo'
+
+
+
+@responses.activate
+def test_requests_failed():
+    """
+    Requests not having the `'success'` result field set to `'yes'` should
+    raise a Proxy6Error
+    """
+    client = Proxy6(api_key='key')
+
+    responses.add(responses.GET, 'https://proxy6.net/api/key/foo', json={
+        'success': 'no', 'error_id': 123, 'error': "Lorem ipsum"
+    })
+
+    with pytest.raises(Proxy6Error) as exc_info:
+        client._request('foo')
+
+    e = exc_info.value
+    assert e.code == 123
+    assert str(e) == "Lorem ipsum"
