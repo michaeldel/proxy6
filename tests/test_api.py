@@ -142,3 +142,31 @@ def test_get_count(request, client):
     request.assert_called_once_with(
         'getcount', params={'country': 'ru', 'version': ProxyVersion.IPv4}
     )
+
+
+@mock.patch('proxy6.api.Proxy6._request')
+def test_get_country(request, client):
+    request.return_value = {
+        'status': 'yes',
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'list': ['ru', 'ua', 'us'],
+    }
+
+    assert client.get_countries() == ['ru', 'ua', 'us']
+
+    request.assert_called_once_with('getcountry', params={})
+    request.reset_mock()
+
+    request.return_value = {
+        'status': 'yes',
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'list': ['de', 'fr', 'es'],
+    }
+
+    assert client.get_countries(version=ProxyVersion.IPv4) == ['de', 'fr', 'es']
+
+    request.assert_called_once_with('getcountry', params={'version': ProxyVersion.IPv4})

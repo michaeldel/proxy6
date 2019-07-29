@@ -1,6 +1,6 @@
 import enum
 
-from typing import Optional
+from typing import List, Optional
 from urllib.parse import urljoin
 
 import requests
@@ -85,3 +85,21 @@ class Proxy6:
         assert len(data) == 1
 
         return data['count']
+
+    def get_countries(self, version: Optional[ProxyVersion] = None) -> List[str]:
+        """
+        Get information on available for proxies purchase countries
+
+        :param version: Proxy version (default is IPv6)
+
+        :returns: list of country codes in ISO2 format
+
+        :raises Proxy6Error:
+        """
+        params = _cleaned_dict(version=version)
+        data = self._request('getcountry', params=params)
+
+        self.__class__._pop_common_fields(data)
+        assert len(data) == 1
+
+        return data['list']
