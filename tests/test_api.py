@@ -87,7 +87,6 @@ def test_get_account(request, client):
 @mock.patch('proxy6.api.Proxy6._request')
 def test_get_price(request, client):
     request.return_value = {
-        'status': 'yes',
         'user_id': '1',
         'balance': '48.80',
         'currency': 'RUB',
@@ -108,7 +107,6 @@ def test_get_price(request, client):
     request.reset_mock()
 
     request.return_value = {
-        'status': 'yes',
         'user_id': '1',
         'balance': '48.80',
         'currency': 'RUB',
@@ -133,7 +131,6 @@ def test_get_price(request, client):
 @mock.patch('proxy6.api.Proxy6._request')
 def test_get_count(request, client):
     request.return_value = {
-        'status': 'yes',
         'user_id': '1',
         'balance': '48.80',
         'currency': 'RUB',
@@ -146,7 +143,6 @@ def test_get_count(request, client):
     request.reset_mock()
 
     request.return_value = {
-        'status': 'yes',
         'user_id': '1',
         'balance': '48.80',
         'currency': 'RUB',
@@ -163,7 +159,6 @@ def test_get_count(request, client):
 @mock.patch('proxy6.api.Proxy6._request')
 def test_get_country(request, client):
     request.return_value = {
-        'status': 'yes',
         'user_id': '1',
         'balance': '48.80',
         'currency': 'RUB',
@@ -176,7 +171,6 @@ def test_get_country(request, client):
     request.reset_mock()
 
     request.return_value = {
-        'status': 'yes',
         'user_id': '1',
         'balance': '48.80',
         'currency': 'RUB',
@@ -191,7 +185,6 @@ def test_get_country(request, client):
 @mock.patch('proxy6.api.Proxy6._request')
 def test_is_proxy_valid(request, client):
     request.return_value = {
-        'status': 'yes',
         'user_id': '1',
         'balance': '48.80',
         'currency': 'RUB',

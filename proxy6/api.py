@@ -41,7 +41,7 @@ class Proxy6:
 
     @staticmethod
     def _pop_common_fields(data: dict):
-        for key in ('status', 'user_id', 'balance', 'currency'):
+        for key in ('user_id', 'balance', 'currency'):
             del data[key]
 
     def get_account(self) -> dict:
