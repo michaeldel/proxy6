@@ -1,5 +1,7 @@
 import enum
 
+from dataclasses import dataclass
+from decimal import Decimal
 from typing import List, Optional
 from urllib.parse import urljoin
 
@@ -20,6 +22,13 @@ class Proxy6Error(Exception):
     def __init__(self, data: dict):
         self.code = data['error_id']
         super().__init__(data['error'])
+
+
+@dataclass
+class Account:
+    user_id: int
+    balance: Decimal
+    currency: str
 
 
 class Proxy6:
@@ -44,7 +53,7 @@ class Proxy6:
         for key in ('user_id', 'balance', 'currency'):
             del data[key]
 
-    def get_account(self) -> dict:
+    def get_account(self) -> Account:
         """
         Get account information
 
@@ -53,9 +62,11 @@ class Proxy6:
         :raises Proxy6Error:
         """
         data = self._request('getcountry')
-        del data['list']
-
-        return data
+        return Account(
+            user_id=int(data['user_id']),
+            balance=Decimal(data['balance']),
+            currency=data['currency'],
+        )
 
     def get_price(
         self, *, count: int, period: int, version: Optional[ProxyVersion] = None

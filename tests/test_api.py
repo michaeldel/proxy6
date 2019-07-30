@@ -1,11 +1,12 @@
 import urllib.parse
 
+from decimal import Decimal
 from unittest import mock
 
 import pytest
 import responses
 
-from proxy6.api import Proxy6, ProxyVersion, Proxy6Error
+from proxy6.api import Account, Proxy6, ProxyVersion, Proxy6Error
 
 
 @responses.activate
@@ -77,11 +78,9 @@ def test_get_account(request, client):
         'list': ['ru', 'ua', 'us'],
     }
 
-    assert client.get_account() == {
-        'user_id': '1',
-        'balance': '48.80',
-        'currency': 'RUB',
-    }
+    assert client.get_account() == Account(
+        user_id=1, balance=Decimal('48.80'), currency='RUB'
+    )
 
 
 @mock.patch('proxy6.api.Proxy6._request')
