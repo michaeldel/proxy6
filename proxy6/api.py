@@ -31,6 +31,14 @@ class Account:
     currency: str
 
 
+@dataclass
+class PriceInformation:
+    price: float
+    price_single: float
+    period: int
+    count: int
+
+
 class Proxy6:
     def __init__(self, api_key: str):
         self._base_url = f'https://proxy6.net/api/{api_key}/'
@@ -70,7 +78,7 @@ class Proxy6:
 
     def get_price(
         self, *, count: int, period: int, version: Optional[ProxyVersion] = None
-    ) -> dict:
+    ) -> PriceInformation:
         """
         Used to get information about the cost of the order, depending on the
         period and number of proxies
@@ -88,7 +96,12 @@ class Proxy6:
 
         self.__class__._pop_common_fields(data)
 
-        return data
+        return PriceInformation(
+            price=data['price'],
+            price_single=data['price_single'],
+            period=data['period'],
+            count=data['count'],
+        )
 
     def get_count(self, *, country: str, version: Optional[ProxyVersion] = None) -> int:
         """
