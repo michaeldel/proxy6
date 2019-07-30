@@ -44,6 +44,19 @@ class Proxy6:
         for key in ('status', 'user_id', 'balance', 'currency'):
             del data[key]
 
+    def get_account(self) -> dict:
+        """
+        Get account information
+
+        :returns: account information
+
+        :raises Proxy6Error:
+        """
+        data = self._request('getcountry')
+        del data['list']
+
+        return data
+
     def get_price(
         self, *, count: int, period: int, version: Optional[ProxyVersion] = None
     ) -> dict:

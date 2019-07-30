@@ -69,6 +69,22 @@ def test_requests_failed():
 
 
 @mock.patch('proxy6.api.Proxy6._request')
+def test_get_account(request, client):
+    request.return_value = {
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'list': ['ru', 'ua', 'us'],
+    }
+
+    assert client.get_account() == {
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+    }
+
+
+@mock.patch('proxy6.api.Proxy6._request')
 def test_get_price(request, client):
     request.return_value = {
         'status': 'yes',
