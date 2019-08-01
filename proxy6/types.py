@@ -3,7 +3,23 @@ import enum
 import ipaddress
 
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Union
+
+
+@dataclass
+class Account:
+    user_id: int
+    balance: Decimal
+    currency: str
+
+
+@dataclass
+class PriceInformation:
+    price: float
+    price_single: float
+    period: int
+    count: int
 
 
 class ProxyType(enum.Enum):

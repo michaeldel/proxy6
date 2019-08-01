@@ -10,7 +10,7 @@ from urllib.parse import urljoin
 import requests
 
 from . import schemas
-from .types import Proxy
+from .types import Account, PriceInformation, Proxy
 
 
 class ProxyVersion(enum.IntEnum):
@@ -34,21 +34,6 @@ class Proxy6Error(Exception):
     def __init__(self, data: dict):
         self.code = data['error_id']
         super().__init__(data['error'])
-
-
-@dataclass
-class Account:
-    user_id: int
-    balance: Decimal
-    currency: str
-
-
-@dataclass
-class PriceInformation:
-    price: float
-    price_single: float
-    period: int
-    count: int
 
 
 class Proxy6:
