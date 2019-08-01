@@ -1,17 +1,29 @@
+import datetime
 import enum
+import ipaddress
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import List, Optional
+from typing import List, Optional, Sequence, Union
 from urllib.parse import urljoin
 
 import requests
+
+from . import schemas
+from .types import Proxy
 
 
 class ProxyVersion(enum.IntEnum):
     IPv4 = 4
     IPv4_SHARED = 3
     IPv6 = 6
+
+
+class ProxyState(enum.Enum):
+    ALL = 'all'
+    ACTIVE = 'active'
+    NOT_ACTIVE = 'expiring'
+    EXPIRED = 'expired'
 
 
 def _cleaned_dict(**kwargs) -> dict:
@@ -140,6 +152,32 @@ class Proxy6:
         assert len(data) == 1
 
         return data['list']
+
+    def get_proxies(
+        self, *, state: Optional[ProxyState] = None, description: Optional[str] = None
+    ) -> Sequence[Proxy]:
+        """
+        Get the list of proxies
+
+        :param state: filter proxies by state
+        :param description: filter proxies by technical comment
+
+        :returns: list of proxies
+
+        :raises Proxy6Error:
+        """
+        params = _cleaned_dict(state=state, descr=description, nokey=True)
+        data = self._request('getproxy', params=params)
+
+        self.__class__._pop_common_fields(data)
+
+        proxies = schemas.ProxySchema().load(data['list'], many=True)
+
+        assert len(proxies) == data['list_count']
+        if description is not None:
+            assert all(proxy.description == description for proxy in proxies)
+
+        return proxies
 
     def is_proxy_valid(self, *, proxy_id: int) -> bool:
         """

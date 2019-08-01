@@ -1,3 +1,5 @@
+import datetime
+import ipaddress
 import urllib.parse
 
 from decimal import Decimal
@@ -6,7 +8,15 @@ from unittest import mock
 import pytest
 import responses
 
-from proxy6.api import Account, PriceInformation, Proxy6, ProxyVersion, Proxy6Error
+from proxy6.api import (
+    Account,
+    PriceInformation,
+    Proxy6,
+    ProxyState,
+    ProxyVersion,
+    Proxy6Error,
+)
+from proxy6.types import Proxy, ProxyType
 
 
 @responses.activate
@@ -173,6 +183,85 @@ def test_get_country(request, client):
     assert client.get_countries(version=ProxyVersion.IPv4) == ['de', 'fr', 'es']
 
     request.assert_called_once_with('getcountry', params={'version': ProxyVersion.IPv4})
+
+
+@mock.patch('proxy6.api.Proxy6._request')
+def test_get_proxies(request, client):
+    request.return_value = {
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'list_count': 2,
+        'list': [
+            {
+                'id': '11',
+                'ip': '2a00:1838:32:19f:45fb:2640::330',
+                'host': '185.22.134.250',
+                'port': '7330',
+                'user': '5svBNZ',
+                'pass': 'iagn2d',
+                'type': 'http',
+                'country': 'ru',
+                'date': '2016-06-19 16:32:39',
+                'date_end': '2016-07-12 11:50:41',
+                'unixtime': 1466379159,
+                'unixtime_end': 1468349441,
+                'descr': "foo",
+                'active': '1',
+            },
+            {
+                'id': '14',
+                'ip': '123.234.213.0',
+                'host': '185.22.134.242',
+                'port': '7386',
+                'user': 'nV5TFK',
+                'pass': '3Itr1t',
+                'type': 'socks',
+                'country': 'ru',
+                'date': '2016-06-27 16:06:22',
+                'date_end': '2016-07-11 16:06:22',
+                'unixtime': 1466379151,
+                'unixtime_end': 1468349441,
+                'descr': "foo",
+                'active': '1',
+            },
+        ],
+    }
+
+    assert client.get_proxies(state=ProxyState.ACTIVE, description="foo") == [
+        Proxy(
+            id=11,
+            ip=ipaddress.ip_address('2a00:1838:32:19f:45fb:2640::330'),
+            host='185.22.134.250',
+            port=7330,
+            user='5svBNZ',
+            password='iagn2d',
+            type=ProxyType.HTTP,
+            country='ru',
+            date_purchased=datetime.datetime(2016, 6, 19, 16, 32, 39),
+            date_expires=datetime.datetime(2016, 7, 12, 11, 50, 41),
+            description="foo",
+            active=True,
+        ),
+        Proxy(
+            id=14,
+            ip=ipaddress.ip_address('123.234.213.0'),
+            host='185.22.134.242',
+            port=7386,
+            user='nV5TFK',
+            password='3Itr1t',
+            type=ProxyType.SOCKS5,
+            country='ru',
+            date_purchased=datetime.datetime(2016, 6, 27, 16, 6, 22),
+            date_expires=datetime.datetime(2016, 7, 11, 16, 6, 22),
+            description="foo",
+            active=True,
+        ),
+    ]
+
+    request.assert_called_once_with(
+        'getproxy', params={'state': ProxyState.ACTIVE, 'descr': "foo", 'nokey': True}
+    )
 
 
 @mock.patch('proxy6.api.Proxy6._request')
