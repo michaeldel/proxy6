@@ -1,6 +1,5 @@
 import datetime
 import ipaddress
-import urllib.parse
 
 from decimal import Decimal
 from unittest import mock

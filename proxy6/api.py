@@ -1,10 +1,7 @@
-import datetime
 import enum
-import ipaddress
 
-from dataclasses import dataclass
 from decimal import Decimal
-from typing import Iterable, List, Optional, Sequence, Union
+from typing import Iterable, List, Optional, Sequence
 from urllib.parse import urljoin
 
 import requests
