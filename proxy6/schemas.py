@@ -28,6 +28,17 @@ class EnumField(fields.Field):
         return self.enum(value)
 
 
+class PriceInformationSchema(Schema):
+    price = fields.Float(required=True)
+    price_single = fields.Float(required=True)
+    period = fields.Integer(required=True)
+    count = fields.Integer(required=True)
+
+    @post_load
+    def make_price_information(self, data, **kwargs):
+        return types.PriceInformation(**data)
+
+
 class ProxySchema(Schema):
     class Meta:
         unknown = EXCLUDE

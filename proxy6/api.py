@@ -90,12 +90,7 @@ class Proxy6:
 
         self.__class__._pop_common_fields(data)
 
-        return PriceInformation(
-            price=data['price'],
-            price_single=data['price_single'],
-            period=data['period'],
-            count=data['count'],
-        )
+        return schemas.PriceInformationSchema().load(data)
 
     def get_count(self, *, country: str, version: Optional[ProxyVersion] = None) -> int:
         """
