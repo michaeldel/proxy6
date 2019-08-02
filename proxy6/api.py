@@ -4,13 +4,13 @@ import ipaddress
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import List, Optional, Sequence, Union
+from typing import Iterable, List, Optional, Sequence, Union
 from urllib.parse import urljoin
 
 import requests
 
 from . import schemas
-from .types import Account, PriceInformation, Proxy
+from .types import Account, PriceInformation, Proxy, ProxyType
 
 
 class ProxyVersion(enum.IntEnum):
@@ -163,6 +163,18 @@ class Proxy6:
             assert all(proxy.description == description for proxy in proxies)
 
         return proxies
+
+    def set_type(self, *, proxies: Iterable[Proxy], type: ProxyType) -> None:
+        """
+        Change the protocol type of proxies
+
+        :param proxies: proxies to set the protocol for
+        :param type: new proxy type
+
+        :raises Proxy6Error:
+        """
+        params = _cleaned_dict(ids=(proxy.id for proxy in proxies), type=type)
+        self._request('settype', params=params)
 
     def is_proxy_valid(self, *, proxy_id: int) -> bool:
         """

@@ -18,6 +18,8 @@ from proxy6.api import (
 )
 from proxy6.types import Proxy, ProxyType
 
+from .factories import ProxyFactory
+
 
 @responses.activate
 def test_requests():
@@ -262,6 +264,30 @@ def test_get_proxies(request, client):
     request.assert_called_once_with(
         'getproxy', params={'state': ProxyState.ACTIVE, 'descr': "foo", 'nokey': True}
     )
+
+
+@mock.patch('proxy6.api.Proxy6._request')
+def test_set_type(request, client):
+    request.return_value = {'user_id': '1', 'balance': '48.80', 'currency': 'RUB'}
+
+    proxies = (
+        ProxyFactory(id=10),
+        ProxyFactory(id=11),
+        ProxyFactory(id=12),
+        ProxyFactory(id=15),
+    )
+    client.set_type(proxies=proxies, type=ProxyType.SOCKS5)
+
+    request.assert_called_once()
+    args, kwargs = request.call_args
+
+    assert args == ('settype',)
+    params = kwargs.pop('params')
+
+    assert list(params['ids']) == [10, 11, 12, 15]
+    assert params['type'] == ProxyType.SOCKS5
+
+    assert kwargs == {}
 
 
 @mock.patch('proxy6.api.Proxy6._request')
