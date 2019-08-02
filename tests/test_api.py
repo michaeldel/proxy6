@@ -107,7 +107,7 @@ def test_get_price(request, client):
     }
 
     assert client.get_price(count=100, period=30) == PriceInformation(
-        price=1800, price_single=0.6, period=30, count=100
+        price=1800, price_single=0.6, period=30, count=100, currency='RUB'
     )
 
     request.assert_called_once_with('getprice', params={'count': 100, 'period': 30})
@@ -125,7 +125,9 @@ def test_get_price(request, client):
 
     assert client.get_price(
         count=200, period=15, version=ProxyVersion.IPv4
-    ) == PriceInformation(price=600, price_single=0.2, period=15, count=200)
+    ) == PriceInformation(
+        price=600, price_single=0.2, period=15, count=200, currency='RUB'
+    )
 
     request.assert_called_once_with(
         'getprice', params={'count': 200, 'period': 15, 'version': ProxyVersion.IPv4}

@@ -88,8 +88,6 @@ class Proxy6:
         params = _cleaned_dict(count=count, period=period, version=version)
         data = self._request('getprice', params=params)
 
-        self.__class__._pop_common_fields(data)
-
         return schemas.PriceInformationSchema().load(data)
 
     def get_count(self, *, country: str, version: Optional[ProxyVersion] = None) -> int:

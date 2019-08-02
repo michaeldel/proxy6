@@ -29,10 +29,14 @@ class EnumField(fields.Field):
 
 
 class PriceInformationSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
     price = fields.Float(required=True)
     price_single = fields.Float(required=True)
     period = fields.Integer(required=True)
     count = fields.Integer(required=True)
+    currency = fields.String(required=True)
 
     @post_load
     def make_price_information(self, data, **kwargs):

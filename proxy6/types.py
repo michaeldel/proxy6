@@ -20,6 +20,7 @@ class PriceInformation:
     price_single: float
     period: int
     count: int
+    currency: str
 
 
 class ProxyType(enum.Enum):
