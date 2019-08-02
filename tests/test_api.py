@@ -291,6 +291,36 @@ def test_set_type(request, client):
 
 
 @mock.patch('proxy6.api.Proxy6._request')
+def test_set_description(request, client):
+    request.return_value = {
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'count': 4,
+    }
+
+    proxies = (
+        ProxyFactory(id=10),
+        ProxyFactory(id=11),
+        ProxyFactory(id=12),
+        ProxyFactory(id=15),
+    )
+    assert client.set_description(proxies=proxies, old="test", new="newtest") == 4
+
+    request.assert_called_once()
+    args, kwargs = request.call_args
+
+    assert args == ('setdescr',)
+    params = kwargs.pop('params')
+
+    assert list(params['ids']) == [10, 11, 12, 15]
+    assert params['old'] == "test"
+    assert params['new'] == "newtest"
+
+    assert kwargs == {}
+
+
+@mock.patch('proxy6.api.Proxy6._request')
 def test_is_proxy_valid(request, client):
     request.return_value = {
         'user_id': '1',

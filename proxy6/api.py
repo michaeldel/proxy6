@@ -176,6 +176,29 @@ class Proxy6:
         params = _cleaned_dict(ids=(proxy.id for proxy in proxies), type=type)
         self._request('settype', params=params)
 
+    def set_description(
+        self,
+        *,
+        new: str,
+        old: Optional[str] = None,
+        proxies: Optional[Iterable[Proxy]] = None,
+    ) -> int:
+        """
+        Update technical comments in the proxy list that was added when buying
+
+        :param proxies: proxies to set the description for
+        :param new: new description
+        :param old: technical comments to be changed, maximum 50 characters
+
+        :returns: amount of proxies that wer changed
+
+        :raises Proxy6Error:
+        """
+        assert old is None or len(old) <= 50
+
+        params = _cleaned_dict(new=new, old=old, ids=(proxy.id for proxy in proxies))
+        return self._request('setdescr', params=params).pop('count')
+
     def is_proxy_valid(self, *, proxy_id: int) -> bool:
         """
         Checks the validity of a proxy
