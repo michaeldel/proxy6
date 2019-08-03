@@ -250,6 +250,19 @@ class Proxy6:
             self._request('prolong', params=params)
         )
 
+    def delete(self, *, proxies: Iterable[Proxy]) -> int:
+        """
+        Delete proxies
+
+        :param proxies: proxies to delete
+
+        :returns: amount of proxies deleted
+
+        :raises Proxy6Error:
+        """
+        params = _cleaned_dict(ids=tuple(proxy.id for proxy in proxies))
+        return self._request('delete', params=params)['count']
+
     def is_proxy_valid(self, *, proxy_id: int) -> bool:
         """
         Checks the validity of a proxy

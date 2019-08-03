@@ -445,6 +445,21 @@ def test_prolong(request, client):
 
 
 @mock.patch('proxy6.api.Proxy6._request')
+def test_delete(request, client):
+    request.return_value = {
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'count': 2,
+    }
+
+    proxies = (ProxyFactory(id=15), ProxyFactory(id=16))
+    assert client.delete(proxies=proxies) == 2
+
+    request.assert_called_once_with('delete', params={'ids': (15, 16)})
+
+
+@mock.patch('proxy6.api.Proxy6._request')
 def test_is_proxy_valid(request, client):
     request.return_value = {
         'user_id': '1',
