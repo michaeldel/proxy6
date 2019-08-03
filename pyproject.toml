@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "proxysix"
-version = "0.1.0"
+version = "1.0.0-alpha.0"
 description = "API wrapper for Proxy6"
 license = "MIT"
 authors = ["michaeldel <michaeldel@protonmail.com>"]
