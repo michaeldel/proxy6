@@ -460,6 +460,20 @@ def test_delete(request, client):
 
 
 @mock.patch('proxy6.api.Proxy6._request')
+def test_delete_by_description(request, client):
+    request.return_value = {
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'count': 2,
+    }
+
+    assert client.delete_by_description(description="foo") == 2
+
+    request.assert_called_once_with('delete', params={'descr': "foo"})
+
+
+@mock.patch('proxy6.api.Proxy6._request')
 def test_is_proxy_valid(request, client):
     request.return_value = {
         'user_id': '1',

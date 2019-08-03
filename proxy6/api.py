@@ -263,6 +263,19 @@ class Proxy6:
         params = _cleaned_dict(ids=tuple(proxy.id for proxy in proxies))
         return self._request('delete', params=params)['count']
 
+    def delete_by_description(self, *, description: str) -> int:
+        """
+        Delete proxies having the given description
+
+        :param description: description to select proxies with
+
+        :returns: amount of proxies deleted
+
+        :raises Proxy6Error:
+        """
+        params = _cleaned_dict(descr=description)
+        return self._request('delete', params=params)['count']
+
     def is_proxy_valid(self, *, proxy_id: int) -> bool:
         """
         Checks the validity of a proxy
