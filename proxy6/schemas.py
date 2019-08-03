@@ -1,7 +1,7 @@
 import enum
 import ipaddress
 
-from marshmallow import EXCLUDE, fields, post_load, Schema
+from marshmallow import EXCLUDE, fields, post_load, pre_load, Schema
 
 from . import types
 
@@ -39,7 +39,7 @@ class PriceInformationSchema(Schema):
     currency = fields.String(required=True)
 
     @post_load
-    def make_price_information(self, data, **kwargs):
+    def make_obj(self, data, **kwargs):
         return types.PriceInformation(**data)
 
 
@@ -70,3 +70,21 @@ class ProxySchema(Schema):
     @post_load
     def make_proxy(self, data, **kwargs):
         return types.Proxy(**data)
+
+
+class PurchaseSchema(PriceInformationSchema):
+    proxies = fields.Nested(ProxySchema, many=True, required=True, data_key='list')
+
+    @pre_load
+    def set_country_and_description(self, data, **kwargs):
+        country = data.pop('country')
+        description = data.pop('description')
+
+        for proxy in data['list']:
+            proxy.update({'country': country, 'descr': description})
+
+        return data
+
+    @post_load
+    def make_obj(self, data, **kwargs):
+        return types.Purchase(**data)

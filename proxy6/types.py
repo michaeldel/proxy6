@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import datetime
 import enum
 import ipaddress
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Union
+from typing import Sequence, Union
 
 
 @dataclass
@@ -21,6 +23,11 @@ class PriceInformation:
     period: int
     count: int
     currency: str
+
+
+@dataclass
+class Purchase(PriceInformation):
+    proxies: Sequence[Proxy]
 
 
 class ProxyType(enum.Enum):
@@ -46,6 +53,5 @@ class Proxy:
     date_purchased: datetime.datetime
     date_expires: datetime.datetime
 
-    description: str
-
     active: bool
+    description: str = field(default="")

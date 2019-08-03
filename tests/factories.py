@@ -22,5 +22,4 @@ class ProxyFactory(factory.Factory):
     date_purchased = factory.Faker('past_datetime', start_date='-30d')
     date_expires = factory.Faker('future_datetime', end_date='+30d')
 
-    description = ""
     active = True

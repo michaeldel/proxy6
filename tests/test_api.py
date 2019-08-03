@@ -15,7 +15,7 @@ from proxy6.api import (
     ProxyVersion,
     Proxy6Error,
 )
-from proxy6.types import Proxy, ProxyType
+from proxy6.types import Proxy, ProxyType, Purchase
 
 from .factories import ProxyFactory
 
@@ -319,6 +319,89 @@ def test_set_description(request, client):
     assert params['new'] == "newtest"
 
     assert kwargs == {}
+
+
+@mock.patch('proxy6.api.Proxy6._request')
+def test_buy(request, client):
+    request.return_value = {
+        'user_id': '1',
+        'balance': '48.80',
+        'currency': 'RUB',
+        'count': 1,
+        'price': 6.3,
+        'price_single': 0.9,
+        'period': 7,
+        'country': 'ru',
+        'list': [
+            {
+                'id': '15',
+                'ip': '2a00:1838:32:19f:45fb:2640::330',
+                'host': '185.22.134.250',
+                'port': '7330',
+                'user': '5svBNZ',
+                'pass': 'iagn2d',
+                'type': 'http',
+                'date': '2016-06-19 16:32:39',
+                'date_end': '2016-07-12 11:50:41',
+                'unixtime': 1466379159,
+                'unixtime_end': 1468349441,
+                'active': '1',
+            }
+        ],
+    }
+
+    assert client.buy(count=1, period=7, country='ru') == Purchase(
+        price=6.3,
+        price_single=0.9,
+        period=7,
+        count=1,
+        currency='RUB',
+        proxies=[
+            Proxy(
+                id=15,
+                ip=ipaddress.ip_address('2a00:1838:32:19f:45fb:2640::330'),
+                host='185.22.134.250',
+                port=7330,
+                country='ru',
+                user='5svBNZ',
+                password='iagn2d',
+                type=ProxyType.HTTP,
+                date_purchased=datetime.datetime(2016, 6, 19, 16, 32, 39),
+                date_expires=datetime.datetime(2016, 7, 12, 11, 50, 41),
+                active=True,
+                description="",
+            )
+        ],
+    )
+
+    request.assert_called_once_with(
+        'buy', params={'count': 1, 'period': 7, 'country': 'ru', 'nokey': True}
+    )
+    request.reset_mock()
+
+    client.buy(
+        count=1,
+        period=7,
+        country='ru',
+        version=ProxyVersion.IPv4,
+        type=ProxyType.HTTP,
+        description="foo",
+        auto_renew=True,
+    )
+
+    request.assert_called_once_with(
+        'buy',
+        params={
+            'count': 1,
+            'period': 7,
+            'country': 'ru',
+            'version': ProxyVersion.IPv4,
+            'type': ProxyType.HTTP,
+            'descr': "foo",
+            'auto_prolong': True,
+            'nokey': True,
+        },
+    )
 
 
 @mock.patch('proxy6.api.Proxy6._request')

@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 import requests
 
 from . import schemas
-from .types import Account, PriceInformation, Proxy, ProxyType
+from .types import Account, Purchase, PriceInformation, Proxy, ProxyType
 
 
 class ProxyVersion(enum.IntEnum):
@@ -188,6 +188,48 @@ class Proxy6:
 
         params = _cleaned_dict(new=new, old=old, ids=(proxy.id for proxy in proxies))
         return self._request('setdescr', params=params).pop('count')
+
+    def buy(
+        self,
+        *,
+        count: int,
+        period: int,
+        country: str,
+        version: Optional[ProxyVersion] = None,
+        type: Optional[ProxyType] = None,
+        description: str = "",
+        auto_renew: bool = False,
+    ) -> Purchase:
+        """
+        Buy proxies
+
+        :param count: amount of proxies to purchase
+        :param period: period for which proxies are purchased in days
+        :param country: country in ISO2 format
+        :param version: proxy version, defaults to IPv6
+        :param type: proxy protocol
+        :param description: technical comment for proxies list, max 50 characters
+        :param auto_renew: enable auto-renewal for purchased proxies
+
+        :returns: purchase information
+
+        :raises Proxy6Error:
+        """
+        assert len(description) <= 50
+
+        params = _cleaned_dict(
+            count=count,
+            period=period,
+            country=country,
+            version=version,
+            type=type,
+            descr=description or None,
+            auto_prolong=auto_renew or None,
+            nokey=True,
+        )
+        return schemas.PurchaseSchema().load(
+            {'description': description or "", **self._request('buy', params=params)}
+        )
 
     def is_proxy_valid(self, *, proxy_id: int) -> bool:
         """
