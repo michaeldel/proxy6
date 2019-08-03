@@ -1,6 +1,8 @@
 import enum
 import ipaddress
 
+from typing import Sequence
+
 from marshmallow import EXCLUDE, fields, post_load, pre_load, Schema
 
 from . import types
@@ -88,3 +90,31 @@ class PurchaseSchema(PriceInformationSchema):
     @post_load
     def make_obj(self, data, **kwargs):
         return types.Purchase(**data)
+
+
+class ProlongationSchema(PriceInformationSchema):
+    def __init__(self, existing_proxies: Sequence[types.Proxy], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.existing_proxies = existing_proxies
+
+    proxies = fields.Nested(ProxySchema, many=True, required=True, data_key='list')
+
+    @pre_load
+    def use_existing_proxies(self, data, **kwargs):
+        temp = data.pop('list')
+        assert len(temp) <= len(self.existing_proxies)
+
+        used_proxies = (
+            proxy for proxy in self.existing_proxies if str(proxy.id) in temp
+        )
+
+        data['list'] = [
+            {**ProxySchema().dump(proxy), 'date_end': temp[str(proxy.id)]['date_end']}
+            for proxy in used_proxies
+        ]
+
+        return data
+
+    @post_load
+    def make_obj(self, data, **kwargs):
+        return types.Prolongation(**data)

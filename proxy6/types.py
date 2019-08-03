@@ -30,6 +30,9 @@ class Purchase(PriceInformation):
     proxies: Sequence[Proxy]
 
 
+Prolongation = Purchase
+
+
 class ProxyType(enum.Enum):
     HTTP = 'http'
     SOCKS5 = 'socks'

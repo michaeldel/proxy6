@@ -1,3 +1,4 @@
+import copy
 import enum
 
 from decimal import Decimal
@@ -7,7 +8,7 @@ from urllib.parse import urljoin
 import requests
 
 from . import schemas
-from .types import Account, Purchase, PriceInformation, Proxy, ProxyType
+from .types import Account, Purchase, PriceInformation, Prolongation, Proxy, ProxyType
 
 
 class ProxyVersion(enum.IntEnum):
@@ -229,6 +230,24 @@ class Proxy6:
         )
         return schemas.PurchaseSchema().load(
             {'description': description or "", **self._request('buy', params=params)}
+        )
+
+    def prolong(self, *, period: int, proxies: Iterable[Proxy]) -> Prolongation:
+        """
+        Extend existing proxies period
+
+        :param period: extension of the period in days
+        :param proxies: proxies to prolong
+
+        :returns: prolongation information
+
+        :raises Proxy6Error:
+        """
+        proxies = copy.deepcopy(proxies)
+
+        params = _cleaned_dict(period=period, ids=tuple(proxy.id for proxy in proxies))
+        return schemas.ProlongationSchema(proxies).load(
+            self._request('prolong', params=params)
         )
 
     def is_proxy_valid(self, *, proxy_id: int) -> bool:

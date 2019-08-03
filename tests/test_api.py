@@ -405,6 +405,46 @@ def test_buy(request, client):
 
 
 @mock.patch('proxy6.api.Proxy6._request')
+def test_prolong(request, client):
+    request.return_value = {
+        'user_id': '1',
+        'balance': 29,
+        'currency': 'RUB',
+        'price': 12.6,
+        'price_single': 0.9,
+        'period': 7,
+        'count': 2,
+        'list': {
+            '15': {
+                'id': 15,
+                'date_end': '2016-07-15 06:30:27',
+                'unixtime_end': 1468349441,
+            },
+            '16': {
+                'id': 16,
+                'date_end': '2016-07-16 09:31:21',
+                'unixtime_end': 1468349529,
+            },
+        },
+    }
+
+    proxies = (ProxyFactory(id=15), ProxyFactory(id=16))
+    prolongation = client.prolong(proxies=proxies, period=7)
+
+    assert prolongation.price == 12.6
+    assert prolongation.price_single == 0.9
+    assert prolongation.period == 7
+    assert prolongation.count == 2
+    assert prolongation.currency == 'RUB'
+
+    a, b = prolongation.proxies
+    assert a.id == 15 and a.date_expires == datetime.datetime(2016, 7, 15, 6, 30, 27)
+    assert b.id == 16 and b.date_expires == datetime.datetime(2016, 7, 16, 9, 31, 21)
+
+    request.assert_called_once_with('prolong', params={'period': 7, 'ids': (15, 16)})
+
+
+@mock.patch('proxy6.api.Proxy6._request')
 def test_is_proxy_valid(request, client):
     request.return_value = {
         'user_id': '1',
