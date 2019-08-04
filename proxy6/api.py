@@ -28,6 +28,11 @@ def _cleaned_dict(**kwargs) -> dict:
     return {k: v for k, v in kwargs.items() if v is not None}
 
 
+def _format_list_param(items: list) -> str:
+    """Format list for Proxy6's non-standard GET query parameters format"""
+    return ','.join(map(str, items))
+
+
 class Proxy6Error(Exception):
     def __init__(self, data: dict):
         self.code = data['error_id']
@@ -164,7 +169,9 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(ids=(proxy.id for proxy in proxies), type=type)
+        params = _cleaned_dict(
+            ids=_format_list_param(proxy.id for proxy in proxies), type=type
+        )
         self._request('settype', params=params)
 
     def set_description(
@@ -187,7 +194,9 @@ class Proxy6:
         """
         assert old is None or len(old) <= 50
 
-        params = _cleaned_dict(new=new, old=old, ids=(proxy.id for proxy in proxies))
+        params = _cleaned_dict(
+            new=new, old=old, ids=_format_list_param(proxy.id for proxy in proxies)
+        )
         return self._request('setdescr', params=params).pop('count')
 
     def buy(
@@ -245,7 +254,9 @@ class Proxy6:
         """
         proxies = copy.deepcopy(proxies)
 
-        params = _cleaned_dict(period=period, ids=tuple(proxy.id for proxy in proxies))
+        params = _cleaned_dict(
+            period=period, ids=_format_list_param(proxy.id for proxy in proxies)
+        )
         return schemas.ProlongationSchema(proxies).load(
             self._request('prolong', params=params)
         )
@@ -260,7 +271,7 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(ids=tuple(proxy.id for proxy in proxies))
+        params = _cleaned_dict(ids=_format_list_param(proxy.id for proxy in proxies))
         return self._request('delete', params=params)['count']
 
     def delete_by_description(self, *, description: str) -> int:

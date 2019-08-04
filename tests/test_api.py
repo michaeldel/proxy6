@@ -279,16 +279,9 @@ def test_set_type(request, client):
     )
     client.set_type(proxies=proxies, type=ProxyType.SOCKS5)
 
-    request.assert_called_once()
-    args, kwargs = request.call_args
-
-    assert args == ('settype',)
-    params = kwargs.pop('params')
-
-    assert list(params['ids']) == [10, 11, 12, 15]
-    assert params['type'] == ProxyType.SOCKS5
-
-    assert kwargs == {}
+    request.assert_called_once_with(
+        'settype', params={'ids': '10,11,12,15', 'type': ProxyType.SOCKS5}
+    )
 
 
 @mock.patch('proxy6.api.Proxy6._request')
@@ -308,17 +301,9 @@ def test_set_description(request, client):
     )
     assert client.set_description(proxies=proxies, old="test", new="newtest") == 4
 
-    request.assert_called_once()
-    args, kwargs = request.call_args
-
-    assert args == ('setdescr',)
-    params = kwargs.pop('params')
-
-    assert list(params['ids']) == [10, 11, 12, 15]
-    assert params['old'] == "test"
-    assert params['new'] == "newtest"
-
-    assert kwargs == {}
+    request.assert_called_once_with(
+        'setdescr', params={'ids': '10,11,12,15', 'old': "test", 'new': "newtest"}
+    )
 
 
 @mock.patch('proxy6.api.Proxy6._request')
@@ -441,7 +426,7 @@ def test_prolong(request, client):
     assert a.id == 15 and a.date_expires == datetime.datetime(2016, 7, 15, 6, 30, 27)
     assert b.id == 16 and b.date_expires == datetime.datetime(2016, 7, 16, 9, 31, 21)
 
-    request.assert_called_once_with('prolong', params={'period': 7, 'ids': (15, 16)})
+    request.assert_called_once_with('prolong', params={'period': 7, 'ids': '15,16'})
 
 
 @mock.patch('proxy6.api.Proxy6._request')
@@ -456,7 +441,7 @@ def test_delete(request, client):
     proxies = (ProxyFactory(id=15), ProxyFactory(id=16))
     assert client.delete(proxies=proxies) == 2
 
-    request.assert_called_once_with('delete', params={'ids': (15, 16)})
+    request.assert_called_once_with('delete', params={'ids': '15,16'})
 
 
 @mock.patch('proxy6.api.Proxy6._request')
