@@ -244,8 +244,8 @@ def test_get_proxies(request, client):
             password='iagn2d',
             type=ProxyType.HTTP,
             country='ru',
-            date_purchased=datetime.datetime(2016, 6, 19, 16, 32, 39),
-            date_expires=datetime.datetime(2016, 7, 12, 11, 50, 41),
+            purchased_at=datetime.datetime(2016, 6, 19, 16, 32, 39),
+            expires_at=datetime.datetime(2016, 7, 12, 11, 50, 41),
             description="foo",
             active=True,
         ),
@@ -258,8 +258,8 @@ def test_get_proxies(request, client):
             password='3Itr1t',
             type=ProxyType.SOCKS5,
             country='ru',
-            date_purchased=datetime.datetime(2016, 6, 27, 16, 6, 22),
-            date_expires=datetime.datetime(2016, 7, 11, 16, 6, 22),
+            purchased_at=datetime.datetime(2016, 6, 27, 16, 6, 22),
+            expires_at=datetime.datetime(2016, 7, 11, 16, 6, 22),
             description="foo",
             active=True,
         ),
@@ -354,8 +354,8 @@ def test_buy(request, client):
                 user='5svBNZ',
                 password='iagn2d',
                 type=ProxyType.HTTP,
-                date_purchased=datetime.datetime(2016, 6, 19, 16, 32, 39),
-                date_expires=datetime.datetime(2016, 7, 12, 11, 50, 41),
+                purchased_at=datetime.datetime(2016, 6, 19, 16, 32, 39),
+                expires_at=datetime.datetime(2016, 7, 12, 11, 50, 41),
                 active=True,
                 description="",
             )
@@ -426,8 +426,8 @@ def test_prolong(request, client):
     assert prolongation.currency == 'RUB'
 
     a, b = prolongation.proxies
-    assert a.id == 15 and a.date_expires == datetime.datetime(2016, 7, 15, 6, 30, 27)
-    assert b.id == 16 and b.date_expires == datetime.datetime(2016, 7, 16, 9, 31, 21)
+    assert a.id == 15 and a.expires_at == datetime.datetime(2016, 7, 15, 6, 30, 27)
+    assert b.id == 16 and b.expires_at == datetime.datetime(2016, 7, 16, 9, 31, 21)
 
     request.assert_called_once_with('prolong', params={'period': 7, 'ids': '15,16'})
 

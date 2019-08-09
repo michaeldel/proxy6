@@ -62,8 +62,8 @@ class ProxySchema(Schema):
     type = EnumField(types.ProxyType, required=True)
     country = fields.String(required=True)
 
-    date_purchased = fields.DateTime(required=True, data_key='date')
-    date_expires = fields.DateTime(required=True, data_key='date_end')
+    purchased_at = fields.DateTime(required=True, data_key='date')
+    expires_at = fields.DateTime(required=True, data_key='date_end')
 
     description = fields.String(required=True, data_key='descr')
 

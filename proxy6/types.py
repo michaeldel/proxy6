@@ -53,8 +53,8 @@ class Proxy:
     type: ProxyType
     country: str
 
-    date_purchased: datetime.datetime
-    date_expires: datetime.datetime
+    purchased_at: datetime.datetime
+    expires_at: datetime.datetime
 
     active: bool
     description: str = field(default="")

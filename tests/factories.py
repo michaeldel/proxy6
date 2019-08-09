@@ -19,7 +19,7 @@ class ProxyFactory(factory.Factory):
     type = ProxyType.HTTP
     country = 'ru'
 
-    date_purchased = factory.Faker('past_datetime', start_date='-30d')
-    date_expires = factory.Faker('future_datetime', end_date='+30d')
+    purchased_at = factory.Faker('past_datetime', start_date='-30d')
+    expires_at = factory.Faker('future_datetime', end_date='+30d')
 
     active = True
