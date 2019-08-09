@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 
 import requests
 
-from . import schemas
+from . import errors, schemas
 from .types import Account, Purchase, PriceInformation, Prolongation, Proxy, ProxyType
 
 
@@ -33,31 +33,6 @@ def _format_list_param(items: list) -> str:
     return ','.join(map(str, items))
 
 
-class Proxy6Error(Exception):
-    def __init__(self, code: int, description: str):
-        self.code = code
-        super().__init__(description)
-
-
-class NoMoneyError(Proxy6Error):
-    """Balance error. Zero or low balance on your account"""
-
-    code = 400
-    description = "Error no money"
-
-
-def _get_error(data: dict) -> Proxy6Error:
-    code = data.pop('error_id')
-    description = data.pop('error')
-
-    for Error in (NoMoneyError,):
-        if code == Error.code:
-            assert description == Error.description
-            return Error
-
-    return Proxy6Error(code=code, description=description)
-
-
 class Proxy6:
     def __init__(self, api_key: str):
         self._base_url = f'https://proxy6.net/api/{api_key}/'
@@ -71,7 +46,7 @@ class Proxy6:
 
         data = response.json()
         if data.pop('status') != 'yes':
-            raise _get_error(data)
+            raise errors.select(data)
 
         return data
 

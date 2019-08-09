@@ -7,14 +7,8 @@ from unittest import mock
 import pytest
 import responses
 
-from proxy6.api import (
-    Account,
-    PriceInformation,
-    Proxy6,
-    ProxyState,
-    ProxyVersion,
-    Proxy6Error,
-)
+from proxy6.api import Account, PriceInformation, Proxy6, ProxyState, ProxyVersion
+from proxy6.errors import Proxy6Error
 from proxy6.types import Proxy, ProxyType, Purchase
 
 from .factories import ProxyFactory
@@ -59,12 +53,21 @@ def test_requests():
 
 
 @responses.activate
-def test_requests_failed():
+@mock.patch('proxy6.errors.select')
+def test_requests_failed(select):
     """
     Requests not having the `'status'` result field set to `'yes'` should
-    raise a Proxy6Error
+    raise error according to errors.select
     """
     client = Proxy6(api_key='key')
+
+    class MockError(Proxy6Error):
+        """Mock error"""
+
+        code = 123
+        description = "Lorem ipsum"
+
+    select.return_value = MockError
 
     responses.add(
         responses.GET,
@@ -72,12 +75,12 @@ def test_requests_failed():
         json={'status': 'no', 'error_id': 123, 'error': "Lorem ipsum"},
     )
 
-    with pytest.raises(Proxy6Error) as exc_info:
+    with pytest.raises(MockError) as exc_info:
         client._request('foo')
 
     e = exc_info.value
     assert e.code == 123
-    assert str(e) == "Lorem ipsum"
+    assert str(e) == "Mock error"
 
 
 @mock.patch('proxy6.api.Proxy6._request')
