@@ -41,13 +41,7 @@ line-length = 88
 skip-string-normalization = true
 
 include = '\.pyi?$'
-exclude = '''
-(
-  /(
-      \.git
-  )/
-)
-'''
+exclude = '\/\..+$'
 
 [build-system]
 requires = ["poetry>=0.12"]
