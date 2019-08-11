@@ -59,6 +59,7 @@ class ProxySchema(Schema):
     user = fields.String(required=True)
     password = fields.String(required=True, data_key='pass')
 
+    version = EnumField(types.ProxyVersion, required=True)
     type = EnumField(types.ProxyType, required=True)
     country = fields.String(required=True)
 
@@ -68,6 +69,12 @@ class ProxySchema(Schema):
     description = fields.String(required=True, data_key='descr')
 
     active = fields.Boolean(required=True)
+
+    @pre_load
+    def parse_version(self, data, **kwargs):
+        """Convert version from string to integer"""
+        data['version'] = int(data['version'])
+        return data
 
     @post_load
     def make_proxy(self, data, **kwargs):

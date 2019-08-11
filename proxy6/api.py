@@ -1,5 +1,4 @@
 import copy
-import enum
 
 from decimal import Decimal
 from typing import Iterable, List, Optional, Sequence
@@ -8,20 +7,16 @@ from urllib.parse import urljoin
 import requests
 
 from . import errors, schemas
-from .types import Account, Purchase, PriceInformation, Prolongation, Proxy, ProxyType
-
-
-class ProxyVersion(enum.IntEnum):
-    IPv4 = 4
-    IPv4_SHARED = 3
-    IPv6 = 6
-
-
-class ProxyState(enum.Enum):
-    ALL = 'all'
-    ACTIVE = 'active'
-    NOT_ACTIVE = 'expiring'
-    EXPIRED = 'expired'
+from .types import (
+    Account,
+    Purchase,
+    PriceInformation,
+    Prolongation,
+    Proxy,
+    ProxyState,
+    ProxyType,
+    ProxyVersion,
+)
 
 
 def _cleaned_dict(**kwargs) -> dict:

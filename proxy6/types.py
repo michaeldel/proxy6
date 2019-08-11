@@ -33,9 +33,22 @@ class Purchase(PriceInformation):
 Prolongation = Purchase
 
 
+class ProxyState(enum.Enum):
+    ALL = 'all'
+    ACTIVE = 'active'
+    NOT_ACTIVE = 'expiring'
+    EXPIRED = 'expired'
+
+
 class ProxyType(enum.Enum):
     HTTP = 'http'
     SOCKS5 = 'socks'
+
+
+class ProxyVersion(enum.IntEnum):
+    IPv4 = 4
+    IPv4_SHARED = 3
+    IPv6 = 6
 
 
 @dataclass
@@ -50,6 +63,7 @@ class Proxy:
     user: str
     password: str
 
+    version: ProxyVersion
     type: ProxyType
     country: str
 

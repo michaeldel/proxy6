@@ -2,7 +2,7 @@ import ipaddress
 
 import factory
 
-from proxy6.types import Proxy, ProxyType
+from proxy6.types import Proxy, ProxyType, ProxyVersion
 
 
 class ProxyFactory(factory.Factory):
@@ -16,6 +16,7 @@ class ProxyFactory(factory.Factory):
     user = factory.Sequence(lambda i: f'user{i}')
     password = 'password'
 
+    version = ProxyVersion.IPv6
     type = ProxyType.HTTP
     country = 'ru'
 
