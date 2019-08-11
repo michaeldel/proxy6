@@ -7,7 +7,10 @@ class Proxy6Error(Exception):
         if description is not None:
             self.description = description
 
-        super().__init__(self.__class__.__doc__)
+        if self.__class__ != Proxy6Error:
+            super().__init__(self.__class__.__doc__)
+        else:
+            super().__init__(f"{description} (code {code})")
 
 
 class CountError(Proxy6Error):
