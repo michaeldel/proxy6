@@ -1,5 +1,7 @@
+import toml
+
 from proxy6 import __version__
 
 
 def test_version():
-    assert __version__ == '1.0.0-alpha.0'
+    assert __version__ == toml.load('pyproject.toml')['tool']['poetry']['version']

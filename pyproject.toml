@@ -31,6 +31,7 @@ responses = "^0.10.6"
 black = {version = "^18.3-alpha.0", allows-prereleases = true}
 factory_boy = "^2.12"
 flake8 = "^3.7"
+toml = "^0.10.0"
 
 [tool.black]
 target-version = ['py37']
