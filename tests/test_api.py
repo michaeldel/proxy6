@@ -7,7 +7,14 @@ from unittest import mock
 import pytest
 import responses
 
-from proxy6.api import Account, PriceInformation, Proxy6, ProxyState, ProxyVersion
+from proxy6.api import (
+    Account,
+    _clean_params,
+    PriceInformation,
+    Proxy6,
+    ProxyState,
+    ProxyVersion,
+)
 from proxy6.errors import Proxy6Error
 from proxy6.types import Proxy, ProxyType, Purchase
 
@@ -83,6 +90,21 @@ def test_requests_failed(select):
     assert str(e) == "Mock error"
 
 
+def test_clean_params():
+    assert _clean_params() == {}
+    assert _clean_params(foo=None) == {}
+    assert _clean_params(foo=0) == {'foo': 0}
+    assert _clean_params(foo=0, bar="", baz=None) == {'foo': 0, 'bar': ""}
+
+    import enum
+
+    class E(enum.Enum):
+        A = 'a'
+        B = 'b'
+
+    assert _clean_params(foo=E.A, bar=E.B) == {'foo': 'a', 'bar': 'b'}
+
+
 @mock.patch('proxy6.api.Proxy6._request')
 def test_get_account(request, client):
     request.return_value = {
@@ -133,7 +155,8 @@ def test_get_price(request, client):
     )
 
     request.assert_called_once_with(
-        'getprice', params={'count': 200, 'period': 15, 'version': ProxyVersion.IPv4}
+        'getprice',
+        params={'count': 200, 'period': 15, 'version': ProxyVersion.IPv4.value},
     )
 
 
@@ -161,7 +184,7 @@ def test_get_count(request, client):
     assert client.get_count(country='ru', version=ProxyVersion.IPv4) == 179
 
     request.assert_called_once_with(
-        'getcount', params={'country': 'ru', 'version': ProxyVersion.IPv4}
+        'getcount', params={'country': 'ru', 'version': ProxyVersion.IPv4.value}
     )
 
 
@@ -188,7 +211,9 @@ def test_get_country(request, client):
 
     assert client.get_countries(version=ProxyVersion.IPv4) == ['de', 'fr', 'es']
 
-    request.assert_called_once_with('getcountry', params={'version': ProxyVersion.IPv4})
+    request.assert_called_once_with(
+        'getcountry', params={'version': ProxyVersion.IPv4.value}
+    )
 
 
 @mock.patch('proxy6.api.Proxy6._request')
@@ -270,7 +295,8 @@ def test_get_proxies(request, client):
     ]
 
     request.assert_called_once_with(
-        'getproxy', params={'state': ProxyState.ACTIVE, 'descr': "foo", 'nokey': True}
+        'getproxy',
+        params={'state': ProxyState.ACTIVE.value, 'descr': "foo", 'nokey': True},
     )
 
 
@@ -287,7 +313,7 @@ def test_set_type(request, client):
     client.set_type(proxies=proxies, type=ProxyType.SOCKS5)
 
     request.assert_called_once_with(
-        'settype', params={'ids': '10,11,12,15', 'type': ProxyType.SOCKS5}
+        'settype', params={'ids': '10,11,12,15', 'type': ProxyType.SOCKS5.value}
     )
 
 
@@ -389,8 +415,8 @@ def test_buy(request, client):
             'count': 1,
             'period': 7,
             'country': 'ru',
-            'version': ProxyVersion.IPv4,
-            'type': ProxyType.HTTP,
+            'version': ProxyVersion.IPv4.value,
+            'type': ProxyType.HTTP.value,
             'descr': "foo",
             'auto_prolong': True,
             'nokey': True,

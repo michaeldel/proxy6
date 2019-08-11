@@ -1,4 +1,5 @@
 import copy
+import enum
 
 from decimal import Decimal
 from typing import Iterable, List, Optional, Sequence
@@ -19,8 +20,12 @@ from .types import (
 )
 
 
-def _cleaned_dict(**kwargs) -> dict:
-    return {k: v for k, v in kwargs.items() if v is not None}
+def _clean_params(**kwargs) -> dict:
+    return {
+        k: (v.value if isinstance(v, enum.Enum) else v)
+        for k, v in kwargs.items()
+        if v is not None
+    }
 
 
 def _format_list_param(items: list) -> str:
@@ -80,7 +85,7 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(count=count, period=period, version=version)
+        params = _clean_params(count=count, period=period, version=version)
         data = self._request('getprice', params=params)
 
         return schemas.PriceInformationSchema().load(data)
@@ -97,7 +102,7 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(country=country, version=version)
+        params = _clean_params(country=country, version=version)
         data = self._request('getcount', params=params)
 
         self.__class__._pop_common_fields(data)
@@ -115,7 +120,7 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(version=version)
+        params = _clean_params(version=version)
         data = self._request('getcountry', params=params)
 
         self.__class__._pop_common_fields(data)
@@ -136,7 +141,7 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(state=state, descr=description, nokey=True)
+        params = _clean_params(state=state, descr=description, nokey=True)
         data = self._request('getproxy', params=params)
 
         self.__class__._pop_common_fields(data)
@@ -158,7 +163,7 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(
+        params = _clean_params(
             ids=_format_list_param(proxy.id for proxy in proxies), type=type
         )
         self._request('settype', params=params)
@@ -183,7 +188,7 @@ class Proxy6:
         """
         assert old is None or len(old) <= 50
 
-        params = _cleaned_dict(
+        params = _clean_params(
             new=new, old=old, ids=_format_list_param(proxy.id for proxy in proxies)
         )
         return self._request('setdescr', params=params).pop('count')
@@ -216,7 +221,7 @@ class Proxy6:
         """
         assert len(description) <= 50
 
-        params = _cleaned_dict(
+        params = _clean_params(
             count=count,
             period=period,
             country=country,
@@ -243,7 +248,7 @@ class Proxy6:
         """
         proxies = copy.deepcopy(proxies)
 
-        params = _cleaned_dict(
+        params = _clean_params(
             period=period, ids=_format_list_param(proxy.id for proxy in proxies)
         )
         return schemas.ProlongationSchema(proxies).load(
@@ -260,7 +265,7 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(ids=_format_list_param(proxy.id for proxy in proxies))
+        params = _clean_params(ids=_format_list_param(proxy.id for proxy in proxies))
         return self._request('delete', params=params)['count']
 
     def delete_by_description(self, *, description: str) -> int:
@@ -273,7 +278,7 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(descr=description)
+        params = _clean_params(descr=description)
         return self._request('delete', params=params)['count']
 
     def is_proxy_valid(self, *, proxy_id: int) -> bool:
@@ -286,7 +291,7 @@ class Proxy6:
 
         :raises Proxy6Error:
         """
-        params = _cleaned_dict(ids=proxy_id)
+        params = _clean_params(ids=proxy_id)
         data = self._request('check', params=params)
 
         self.__class__._pop_common_fields(data)
