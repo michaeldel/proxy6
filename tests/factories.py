@@ -9,6 +9,8 @@ class ProxyFactory(factory.Factory):
     class Meta:
         model = Proxy
 
+    id = factory.Sequence(lambda i: i)
+
     ip = factory.Sequence(ipaddress.ip_address)
     host = factory.Sequence(lambda i: str(ipaddress.ip_address(i)))
     port = factory.Faker('pyint')

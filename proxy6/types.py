@@ -72,3 +72,8 @@ class Proxy:
 
     active: bool
     description: str = field(default="")
+
+    @property
+    def url(self):
+        scheme = self.type.name.lower()
+        return f'{scheme}://{self.user}:{self.password}@{self.host}:{self.port}'
